@@ -979,7 +979,7 @@ else
 fi
 
 # Download Drupal 7 core.
-COMMAND="$BUILDPATH/scripts-of-usefulness/script-components/download-drupal7-core.sh --multisitename=$MULTISITENAME --corepath=$BUILDPATH/core --drupalversion=7"
+COMMAND="'$BUILDPATH/scripts-of-usefulness/script-components/download-drupal7-core.sh' --multisitename='$MULTISITENAME' --corepath='$BUILDPATH/core' --drupalversion=7"
 eval ${COMMAND}
 
 cd "$BUILDPATH"
@@ -1564,7 +1564,7 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
           if [ ! -e "$DATABASEDUMPPATH" ]; then
             echo "Oops! '$DATABASEDUMPPATH' either doesn't exist or isn't a readable file. Please try again..."
           else
-            COMMAND="mysql -u $DBUSERNAME -p$DBPASSWORD $DBNAME < $DATABASEDUMPPATH"
+            COMMAND="mysql -u '$DBUSERNAME' -p'$DBPASSWORD' '$DBNAME' < '$DATABASEDUMPPATH'"
             echo "Attempting import: $COMMAND...
             "
             eval ${COMMAND}
@@ -1589,7 +1589,7 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
         echo "Testing database..."
 
         # Run the script which clears caches and rebuilds the registry.
-        COMMAND="$BUILDPATH/scripts-of-usefulness/drush-rebuild-registry.sh --uri=$URI --multisitename=$MULTISITENAME --buildpath=$BUILDPATH --drupalversion=7"
+        COMMAND="'$BUILDPATH/scripts-of-usefulness/drush-rebuild-registry.sh' --uri='$URI' --multisitename='$MULTISITENAME' --buildpath='$BUILDPATH' --drupalversion=7"
         eval ${COMMAND}
       else
 
@@ -1672,7 +1672,7 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
           drush --uri="$URI" cc all
 
           # Open the site in a web browser.
-          COMMAND="$BUILDPATH/scripts-of-usefulness/script-components/open-url.sh $PROTOCOL://$URI"
+          COMMAND="'$BUILDPATH/scripts-of-usefulness/script-components/open-url.sh' $PROTOCOL://$URI"
           eval ${COMMAND}
 
           echo "
