@@ -455,11 +455,11 @@ Using: $BUILDPATH.
 mkdir "$BUILDPATH/build-information"
 
 # Create files to represent variables.
-echo "$BUILDPATH" > "$BUILDPATH/build-information/BUILDPATH.txt"
-echo "$BUILDTYPE" > "$BUILDPATH/build-information/BUILDTYPE.txt"
-echo "$URI" > "$BUILDPATH/build-information/URI.txt"
-echo "$MULTISITENAME" > "$BUILDPATH/build-information/MULTISITENAME.txt"
-echo "$PROJECTSBRANCH" > "$BUILDPATH/build-information/PROJECTSBRANCH.txt"
+echo "$BUILDPATH" > "$BUILDPATH/build-information/buildpath-BUILDPATH.txt"
+echo "$BUILDTYPE" > "$BUILDPATH/build-information/buildtype-BUILDTYPE.txt"
+echo "$URI" > "$BUILDPATH/build-information/uri-URI.txt"
+echo "$MULTISITENAME" > "$BUILDPATH/build-information/multisitename-MULTISITENAME.txt"
+echo "$PROJECTSBRANCH" > "$BUILDPATH/build-information/projectsbranch-PROJECTSBRANCH.txt"
 
 # ---
 
