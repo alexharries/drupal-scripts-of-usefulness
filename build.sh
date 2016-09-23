@@ -455,11 +455,11 @@ Using: $BUILDPATH.
 mkdir "$BUILDPATH/build-information"
 
 # Create files to represent variables.
-echo "$BUILDPATH" > "$BUILDPATH/build-information/buildpath-BUILDPATH.txt"
-echo "$BUILDTYPE" > "$BUILDPATH/build-information/buildtype-BUILDTYPE.txt"
-echo "$URI" > "$BUILDPATH/build-information/uri-URI.txt"
-echo "$MULTISITENAME" > "$BUILDPATH/build-information/multisitename-MULTISITENAME.txt"
-echo "$PROJECTSBRANCH" > "$BUILDPATH/build-information/projectsbranch-PROJECTSBRANCH.txt"
+echo "$BUILDPATH" > "$BUILDPATH/build-information/buildpath.txt"
+echo "$BUILDTYPE" > "$BUILDPATH/build-information/buildtype.txt"
+echo "$URI" > "$BUILDPATH/build-information/uri.txt"
+echo "$MULTISITENAME" > "$BUILDPATH/build-information/multisitename.txt"
+echo "$PROJECTSBRANCH" > "$BUILDPATH/build-information/projectsbranch.txt"
 
 # ---
 
@@ -588,16 +588,18 @@ fi
 if [ "x$FEATURESCHECKOUTBRANCH" = "x" ]; then
   # Don't ask for Features branch if we have a default.
   if [ "x$FEATURESCHECKOUTBRANCH_DEFAULT" = "x" ]; then
-    if [ "$FEATURESCHECKOUT" = "fourcommunications" ] || [ "$FEATURESCHECKOUT" = "alexharries" ] || [ "$FEATURESCHECKOUT" = "custom" ]; then
-      echo -n "
-    *************************************************************************
+    FEATURESCHECKOUTBRANCH_DEFAULT="master"
+  fi
 
-    What branch should be checked out for the Features repository? (Leave blank for default '$FEATURESCHECKOUTBRANCH_DEFAULT') : "
-      read FEATURESCHECKOUTBRANCH
+  if [ "$FEATURESCHECKOUT" = "fourcommunications" ] || [ "$FEATURESCHECKOUT" = "alexharries" ] || [ "$FEATURESCHECKOUT" = "custom" ]; then
+    echo -n "
+  *************************************************************************
 
-      if [ "x$FEATURESCHECKOUTBRANCH" = "x" ]; then
-        FEATURESCHECKOUTBRANCH="$FEATURESCHECKOUTBRANCH_DEFAULT"
-      fi
+  What branch should be checked out for the Features repository? (Leave blank for default '$FEATURESCHECKOUTBRANCH_DEFAULT') : "
+    read FEATURESCHECKOUTBRANCH
+
+    if [ "x$FEATURESCHECKOUTBRANCH" = "x" ]; then
+      FEATURESCHECKOUTBRANCH="$FEATURESCHECKOUTBRANCH_DEFAULT"
     fi
   fi
 fi
@@ -698,16 +700,18 @@ fi
 if [ "x$PROJECTSCHECKOUTBRANCH" = "x" ]; then
   # Don't ask for Projects branch if we have a default.
   if [ "x$PROJECTSCHECKOUTBRANCH_DEFAULT" = "x" ]; then
-    if [ "$PROJECTSCHECKOUT" = "fourcommunications" ] || [ "$PROJECTSCHECKOUT" = "alexharries" ] || [ "$PROJECTSCHECKOUT" = "custom" ]; then
-      echo -n "
-    *************************************************************************
+    PROJECTSCHECKOUTBRANCH_DEFAULT="master"
+  fi
 
-    What branch should be checked out for the Projects repository? (Leave blank for default '$PROJECTSCHECKOUTBRANCH_DEFAULT') : "
-      read PROJECTSCHECKOUTBRANCH
+  if [ "$PROJECTSCHECKOUT" = "fourcommunications" ] || [ "$PROJECTSCHECKOUT" = "alexharries" ] || [ "$PROJECTSCHECKOUT" = "custom" ]; then
+    echo -n "
+  *************************************************************************
 
-      if [ "x$PROJECTSCHECKOUTBRANCH" = "x" ]; then
-        PROJECTSCHECKOUTBRANCH="$PROJECTSCHECKOUTBRANCH_DEFAULT"
-      fi
+  What branch should be checked out for the Projects repository? (Leave blank for default '$PROJECTSCHECKOUTBRANCH_DEFAULT') : "
+    read PROJECTSCHECKOUTBRANCH
+
+    if [ "x$PROJECTSCHECKOUTBRANCH" = "x" ]; then
+      PROJECTSCHECKOUTBRANCH="$PROJECTSCHECKOUTBRANCH_DEFAULT"
     fi
   fi
 fi
@@ -979,7 +983,7 @@ else
 fi
 
 # Download Drupal 7 core.
-COMMAND="'$BUILDPATH/scripts-of-usefulness/script-components/download-drupal7-core.sh' --multisitename='$MULTISITENAME' --corepath='$BUILDPATH/core' --drupalversion=7"
+COMMAND="\"$BUILDPATH/scripts-of-usefulness/script-components/download-drupal7-core.sh\" --multisitename=\"$MULTISITENAME\" --corepath=\"$BUILDPATH/core\" --drupalversion=7"
 eval ${COMMAND}
 
 cd "$BUILDPATH"
@@ -1564,7 +1568,7 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
           if [ ! -e "$DATABASEDUMPPATH" ]; then
             echo "Oops! '$DATABASEDUMPPATH' either doesn't exist or isn't a readable file. Please try again..."
           else
-            COMMAND="mysql -u '$DBUSERNAME' -p'$DBPASSWORD' '$DBNAME' < '$DATABASEDUMPPATH'"
+            COMMAND="mysql -u \"$DBUSERNAME\" -p\"$DBPASSWORD\" \"$DBNAME\" < \"$DATABASEDUMPPATH\""
             echo "Attempting import: $COMMAND...
             "
             eval ${COMMAND}
@@ -1589,7 +1593,7 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
         echo "Testing database..."
 
         # Run the script which clears caches and rebuilds the registry.
-        COMMAND="'$BUILDPATH/scripts-of-usefulness/drush-rebuild-registry.sh' --uri='$URI' --multisitename='$MULTISITENAME' --buildpath='$BUILDPATH' --drupalversion=7"
+        COMMAND="\"$BUILDPATH/scripts-of-usefulness/drush-rebuild-registry.sh\" --uri=\"$URI\" --multisitename=\"$MULTISITENAME\" --buildpath=\"$BUILDPATH\" --drupalversion=7"
         eval ${COMMAND}
       else
 
@@ -1618,6 +1622,28 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
 
   Please choose a password for $ADMINUSERNAME: "
           read ADMINPASS
+
+          echo -n "
+  *************************************************************************
+
+  What is the site's name, e.g. 'Widgets Online': "
+          read SITENAME
+
+          echo -n "
+  *************************************************************************
+
+  What is the site's email address?: "
+          read SITEMAIL
+
+          echo -n "
+  *************************************************************************
+
+  What install profile should we use? Leave blank for the default, 'greyheadprofile': "
+          read PROFILE
+
+          if [ "x$PROFILE" = "x" ]; then
+            PROFILE="greyheadprofile"
+          fi
 
           FEATURESTOENABLE="drupal_search paragraph_page development_settings backup_migrate_daily"
 
@@ -1648,7 +1674,7 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
 
           cd "$BUILDPATH/core/www/sites/$MULTISITENAME"
 
-          drush --uri="$URI" site-install minimal --account-name="$ADMINUSERNAME" --account-pass="$ADMINPASS"
+          drush --uri="$URI" site-install "$PROFILE" --account-name="$ADMINUSERNAME" --account-pass="$ADMINPASS" --site-name="$SITENAME" --site-mail="$SITEMAIL"
 
           echo "
   *************************************************************************
@@ -1672,7 +1698,7 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
           drush --uri="$URI" cc all
 
           # Open the site in a web browser.
-          COMMAND="'$BUILDPATH/scripts-of-usefulness/script-components/open-url.sh' $PROTOCOL://$URI"
+          COMMAND="\"$BUILDPATH/scripts-of-usefulness/script-components/open-url.sh\" $PROTOCOL://$URI"
           eval ${COMMAND}
 
           echo "
