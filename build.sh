@@ -501,7 +501,7 @@ fi
 # ---
 
 # Have we been passed in a --githubuser parameter? If not, get it now.
-GITHUBUSER_DEFAULT="fourcommunications"
+GITHUBUSER_DEFAULT="alexharries"
 
 if [ "x$GITHUBUSER_CORE" = "x" ]; then
   GITHUBUSER_CORE="$GITHUBUSER_DEFAULT"
