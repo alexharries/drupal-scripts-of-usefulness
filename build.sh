@@ -1715,7 +1715,7 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
 
   Running Drush site install command:
 
-    cd \"$BUILDPATH/core/www/sites/$MULTISITENAME\"
+    cd \"$BUILDPATH/core/www/sites/$MULTISITENAMENOHYPHENS\"
 
     drush --uri=\"$URI\" site-install -d \"$PROFILE\" --db-url=\"mysql://$DBUSERNAME:$DBPASSWORD@$DBHOST:$DBPORT/$DBNAME\" --account-name=\"$ADMINUSERNAME\" --account-pass=\"$ADMINPASS\" --account-mail=\"$SITEMAIL\" --site-name=\"$SITENAME\" --site-mail=\"$SITEMAIL\"
 
@@ -1729,7 +1729,6 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
 
   "
 
-          cd "$BUILDPATH/core/www/sites/$MULTISITENAME"
           drush --uri="$URI" site-install -d "$PROFILE" --db-url="mysql://$DBUSERNAME:$DBPASSWORD@$DBHOST:$DBPORT/$DBNAME" --account-name="$ADMINUSERNAME" --account-pass="$ADMINPASS" --account-mail="$SITEMAIL" --site-name="$SITENAME" --site-mail="$SITEMAIL"
           cd "$BUILDPATH/core/www/sites/$MULTISITENAMENOHYPHENS"
 
