@@ -1670,11 +1670,30 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
           echo "
   *************************************************************************
 
-  Beginning install..."
+  Beginning install.
+
+  IMPORTANT: if the install process fails, check that the mysql server is
+  running. If you are using MAMP, you may need to use 'localhost' instead of
+  '127.0.0.1' to connect.
+
+  Running Drush site install command:
+
+    cd \"$BUILDPATH/core/www/sites/$MULTISITENAME\"
+
+    drush --uri=\"$URI\" site-install -d \"$PROFILE\" --db-url=\"mysql://$DBUSERNAME:$DBPASSWORD@$DBHOST:$DBPORT/$DBNAME\" --account-name=\"$ADMINUSERNAME\" --account-pass=\"$ADMINPASS\" --account-mail=\"$SITEMAIL\" --site-name=\"$SITENAME\" --site-mail=\"$SITEMAIL\"
+
+    drush --uri=\"$URI\" en features \"$FEATURESTOENABLE\" -y
+
+    drush --uri=\"$URI\" fra -y
+
+    drush --uri=\"$URI\" cc all
+
+  ...
+
+  "
 
           cd "$BUILDPATH/core/www/sites/$MULTISITENAME"
-
-          drush --uri="$URI" site-install "$PROFILE" --account-name="$ADMINUSERNAME" --account-pass="$ADMINPASS" --site-name="$SITENAME" --site-mail="$SITEMAIL"
+          drush --uri="$URI" site-install -d "$PROFILE" --db-url="mysql://$DBUSERNAME:$DBPASSWORD@$DBHOST:$DBPORT/$DBNAME" --account-name="$ADMINUSERNAME" --account-pass="$ADMINPASS" --account-mail="$SITEMAIL" --site-name="$SITENAME" --site-mail="$SITEMAIL"
 
           echo "
   *************************************************************************
