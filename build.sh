@@ -466,7 +466,7 @@ echo "$PROJECTSBRANCH" > "$BUILDPATH/build-information/projectsbranch.txt"
 # Only request files path if this isn't a live build.
 if [ ! "$BUILDTYPE" = "LIVE" ]; then
 
-  FILESPATHDEFAULT="$BUILDPATH/../../files/$BUILDTYPE/$MULTISITENAME"
+  FILESPATHDEFAULT="$BUILDPATH/../../files/$BUILDTYPE/$MULTISITENAMENOHYPHENS"
   if [ ! -d "$FILESPATH" ]; then
     until [ -d "$FILESPATH" ]; do
       echo -n "
@@ -1038,8 +1038,8 @@ if [ -d "$BUILDPATH/sites-projects" ]; then
   # a multisite name, symlink the project dir and drush aliases in now.
   if [ ! "x$MULTISITENAME" = "x" ]; then
     # Symlink the multisite directory from sites/ to its physical location.
-    MULTISITEPHYSICALLOCATION="$BUILDPATH/sites-projects/$MULTISITENAME"
-    MULTISITESYMLINKLOCATION="$BUILDPATH/core/www/sites/$MULTISITENAME"
+    MULTISITEPHYSICALLOCATION="$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS"
+    MULTISITESYMLINKLOCATION="$BUILDPATH/core/www/sites/$MULTISITENAMENOHYPHENS"
 
     if [[ ! -d "$MULTISITEPHYSICALLOCATION" && -d "$BUILDPATH/multisite-template" ]]; then
       echo -p "
@@ -1055,7 +1055,8 @@ Multisite directory $MULTISITEPHYSICALLOCATION not found. Do you want to create 
         cp -R "$BUILDPATH/multisite-template/sites-template" "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS"
         perl -pi -e "s/SETTINGS_SITE_URLS\[\] = {{DOMAIN}}/; SETTINGS_SITE_URLS\[\] = {{DOMAIN}}/g" "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/settings.site_urls.info"
 
-        MULTISITETHEMEPATH="$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/themes"
+        MULTISITEDIRECTORY="$BUILDPATH/sites-projects"
+        MULTISITETHEMEPATH="$MULTISITEDIRECTORY/$MULTISITENAMENOHYPHENS/themes"
         MULTISITETHEMETEMPLATEPATH="$MULTISITETHEMEPATH/username_bootstrap_subtheme"
 
         echo -n "
@@ -1072,14 +1073,16 @@ Y/n: "
         if echo "$answer" | grep -iq "^y" ;then
           # Create the Bootstrap sub-subtheme.
 
-          echo "Creating the subtheme ${MULTISITENAMENOHYPHENS}_bootstrap_subtheme at $BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/themes:"
+          THEMENAME="${MULTISITENAMENOHYPHENS}_bootstrap_subtheme"
+
+          echo "Creating the subtheme $THEMENAME at $BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/themes:"
 
           cd "$MULTISITETHEMEPATH"
-          mv username_bootstrap_subtheme "$MULTISITENAMENOHYPHENS"_bootstrap_subtheme
-          cd "$MULTISITENAMENOHYPHENS"_bootstrap_subtheme
-          mv username_bootstrap_subtheme.info "$MULTISITENAMENOHYPHENS"_bootstrap_subtheme.info
+          mv username_bootstrap_subtheme "$THEMENAME"
+          cd "$THEMENAME"
+          mv username_bootstrap_subtheme.info "${THEMENAME}.info"
 
-          perl -pi -e "s/{{username}}/$MULTISITENAMENOHYPHENS/g" "$MULTISITENAMENOHYPHENS"_bootstrap_subtheme.info
+          perl -pi -e "s/{{username}}/$MULTISITENAMENOHYPHENS/g" "${THEMENAME}.info"
           perl -pi -e "s/{{username}}/$MULTISITENAMENOHYPHENS/g" "prepros.cfg"
           perl -pi -e "s/function username/function $MULTISITENAMENOHYPHENS/g" "template.php"
 
@@ -1091,10 +1094,10 @@ Y/n: "
 
         # Commit and push.
         echo "Committing..."
-        cd ../../..
+        cd "$MULTISITEDIRECTORY"
 
-        git add "./$MULTISITENAME"
-        git commit -m "Setting up $MULTISITENAME multisite directory."
+        git add "./$MULTISITENAMENOHYPHENS"
+        git commit -m "Setting up $MULTISITENAMENOHYPHENS multisite directory."
         git push
 
         echo "Committed.
@@ -1236,9 +1239,9 @@ Leave blank for the default '$MULTISITENAMENOHYPHENS': "
       echo "
 *************************************************************************
 
-Creating the settings.this_site_url.info file at $BUILDPATH/sites-projects/$MULTISITENAME/settings.this_site_url.info"
+Creating the settings.this_site_url.info file at $BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/settings.this_site_url.info"
 
-      echo "SETTINGS_SITE_URLS[] = $URI" > "$BUILDPATH/sites-projects/$MULTISITENAME/settings.this_site_url.info"
+      echo "SETTINGS_SITE_URLS[] = $URI" > "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/settings.this_site_url.info"
 
       echo "
 
@@ -1278,8 +1281,8 @@ if [[ -d "$BUILDPATH/core/www" && -d "$BUILDPATH/sites-common" ]]; then
 fi
 
 # Symlink the multisite itself.
-MULTISITESYMLINKPATH="$BUILDPATH/core/www/sites/$MULTISITENAME"
-MULTISITEPHYSICALPATH="$BUILDPATH/sites-projects/$MULTISITENAME"
+MULTISITESYMLINKPATH="$BUILDPATH/core/www/sites/$MULTISITENAMENOHYPHENS"
+MULTISITEPHYSICALPATH="$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS"
 if [[ -d "$BUILDPATH/core/www" && -d "$MULTISITEPHYSICALPATH" && ! -e "$MULTISITESYMLINKPATH" ]]; then
   echo "Linking $MULTISITESYMLINKPATH to $MULTISITEPHYSICALPATH:"
   ln -s "$MULTISITEPHYSICALPATH" "$MULTISITESYMLINKPATH"
@@ -1299,18 +1302,18 @@ fi
 
 # Only symlink to files if we're not building for live, if the multisite dir
 # is set up, and there isn't already a files link/directory.
-if [[ ! "$BUILDTYPE" = "LIVE" && -d "$BUILDPATH/sites-projects/$MULTISITENAME" ]]; then
+if [[ ! "$BUILDTYPE" = "LIVE" && -d "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS" ]]; then
   echo "
 *************************************************************************
 
-Symlinking $BUILDPATH/sites-projects/$MULTISITENAME/files to $FILESPATH: "
+Symlinking $BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/files to $FILESPATH: "
 
-  if [ -e "$BUILDPATH/sites-projects/$MULTISITENAME/files" ]; then
-    echo "$BUILDPATH/sites-projects/$MULTISITENAME/files exists; moving it to $BUILDPATH/files-old..."
-    mv "$BUILDPATH/sites-projects/$MULTISITENAME/files" "$BUILDPATH/files-old"
+  if [ -e "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/files" ]; then
+    echo "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/files exists; moving it to $BUILDPATH/files-old..."
+    mv "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/files" "$BUILDPATH/files-old"
   fi
 
-  ln -s "$FILESPATH" "$BUILDPATH/sites-projects/$MULTISITENAME/files"
+  ln -s "$FILESPATH" "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS/files"
 fi
 
 # ---
@@ -1672,7 +1675,7 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
 
   Beginning install..."
 
-          cd "$BUILDPATH/core/www/sites/$MULTISITENAME"
+          cd "$BUILDPATH/core/www/sites/$MULTISITENAMENOHYPHENS"
 
           drush --uri="$URI" site-install "$PROFILE" --account-name="$ADMINUSERNAME" --account-pass="$ADMINPASS" --site-name="$SITENAME" --site-mail="$SITEMAIL"
 
@@ -1689,6 +1692,18 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
   Reverting features..."
 
           drush --uri="$URI" fra -y
+
+          if [ ! "x$THEMENAME" = "x" ]; then
+
+            echo "
+    *************************************************************************
+
+    Setting the theme to $THEMENAME:"
+
+            drush --uri="$URI" enable "$THEMENAME" -y
+            drush --uri="$URI" vset theme_default "$THEMENAME" -y
+
+          fi
 
           echo "
   *************************************************************************
@@ -1784,16 +1799,16 @@ if [ "$BUILDTYPE" = "LIVE" ]; then
     mv "$BUILDPATH/features" "$BUILDPATH/core/www/sites/all/modules/features"
   fi
 
-  # If sites-projects/$MULTISITENAME is present.
-  if [ -d "$BUILDPATH/sites-projects/$MULTISITENAME" ]; then
-    # If core/www/sites/$MULTISITENAME exists.
-    if [ -e "$BUILDPATH/core/www/sites/$MULTISITENAME" ]; then
-      rm -rf "$BUILDPATH/core/www/sites/$MULTISITENAME"
+  # If sites-projects/$MULTISITENAMENOHYPHENS is present.
+  if [ -d "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS" ]; then
+    # If core/www/sites/$MULTISITENAMENOHYPHENS exists.
+    if [ -e "$BUILDPATH/core/www/sites/$MULTISITENAMENOHYPHENS" ]; then
+      rm -rf "$BUILDPATH/core/www/sites/$MULTISITENAMENOHYPHENS"
     fi
 
-    # Move sites-projects/$MULTISITENAME to
-    # core/www/sites/$MULTISITENAME.
-    mv "$BUILDPATH/sites-projects/$MULTISITENAME" "$BUILDPATH/core/www/sites/$MULTISITENAME"
+    # Move sites-projects/$MULTISITENAMENOHYPHENS to
+    # core/www/sites/$MULTISITENAMENOHYPHENS.
+    mv "$BUILDPATH/sites-projects/$MULTISITENAMENOHYPHENS" "$BUILDPATH/core/www/sites/$MULTISITENAMENOHYPHENS"
   fi
 
   # Lastly, remove the rest of sites-projects an multisite-template.
@@ -1803,7 +1818,7 @@ if [ "$BUILDTYPE" = "LIVE" ]; then
   # Now create the tar.gz. Change to the parent dir of the build directory.
   cd "$BUILDPATH/.."
 
-  # Create a new directory called drupal7-$MULTISITENAME-v$CREATETAG.tar.gz
+  # Create a new directory called drupal7-$MULTISITENAMENOHYPHENS-v$CREATETAG.tar.gz
   TAGARCHIVENAME="$BUILDARCHIVENAME.tar.gz"
   tar -czvf "$BUILDPATH/../$TAGARCHIVENAME" "$BUILDARCHIVENAME"
 
