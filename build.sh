@@ -1087,6 +1087,40 @@ Y/n: "
           perl -pi -e "s/function username/function $MULTISITENAMENOHYPHENS/g" "template.php"
 
           echo "Done."
+
+          echo -n "
+  *************************************************************************
+
+  Do you want to create a symlink to a node_modules directory so you can run
+  Grunt in the theme to aggregate LESS into CSS?
+
+  Y/n: "
+
+          old_stty_cfg=$(stty -g)
+          stty raw -echo ; answer=$(head -c 1) ; stty $old_stty_cfg # Care playing with stty
+          if echo "$answer" | grep -iq "^y" ;then
+            # Get the target path.
+            NODEMODULESPATH_DEFAULT="/Volumes/Sites/Greyhead Design/node_modules"
+
+            echo -n "
+          *************************************************************************
+
+          What is the path to the node_modules directory (ending in the node_modules
+          directory name. Don't include a trailing slash).
+
+          For example: /Volumes/Sites/Greyhead Design/node_modules
+
+          Leave blank for default '$NODEMODULESPATH_DEFAULT') : "
+            read NODEMODULESPATH
+
+            if [ "x$NODEMODULESPATH" = "x" ]; then
+              NODEMODULESPATH="$NODEMODULESPATH_DEFAULT"
+            fi
+          fi
+
+          cd "${MULTISITETHEMEPATH}/${MULTISITENAMENOHYPHENS}_bootstrap_subtheme"
+          ln -s "$NODEMODULESPATH" node_modules
+
         else
           echo "Removing theme template from $MULTISITETHEMETEMPLATEPATH"
           rm -r "$MULTISITETHEMETEMPLATEPATH"
@@ -1673,11 +1707,31 @@ if [ ! "$BUILDTYPE" = "LIVE" ]; then
           echo "
   *************************************************************************
 
-  Beginning install..."
+  Beginning install.
 
+  IMPORTANT: if the install process fails, check that the mysql server is
+  running. If you are using MAMP, you may need to use 'localhost' instead of
+  '127.0.0.1' to connect.
+
+  Running Drush site install command:
+
+    cd \"$BUILDPATH/core/www/sites/$MULTISITENAME\"
+
+    drush --uri=\"$URI\" site-install -d \"$PROFILE\" --db-url=\"mysql://$DBUSERNAME:$DBPASSWORD@$DBHOST:$DBPORT/$DBNAME\" --account-name=\"$ADMINUSERNAME\" --account-pass=\"$ADMINPASS\" --account-mail=\"$SITEMAIL\" --site-name=\"$SITENAME\" --site-mail=\"$SITEMAIL\"
+
+    drush --uri=\"$URI\" en features \"$FEATURESTOENABLE\" -y
+
+    drush --uri=\"$URI\" fra -y
+
+    drush --uri=\"$URI\" cc all
+
+  ...
+
+  "
+
+          cd "$BUILDPATH/core/www/sites/$MULTISITENAME"
+          drush --uri="$URI" site-install -d "$PROFILE" --db-url="mysql://$DBUSERNAME:$DBPASSWORD@$DBHOST:$DBPORT/$DBNAME" --account-name="$ADMINUSERNAME" --account-pass="$ADMINPASS" --account-mail="$SITEMAIL" --site-name="$SITENAME" --site-mail="$SITEMAIL"
           cd "$BUILDPATH/core/www/sites/$MULTISITENAMENOHYPHENS"
-
-          drush --uri="$URI" site-install "$PROFILE" --account-name="$ADMINUSERNAME" --account-pass="$ADMINPASS" --site-name="$SITENAME" --site-mail="$SITEMAIL"
 
           echo "
   *************************************************************************
