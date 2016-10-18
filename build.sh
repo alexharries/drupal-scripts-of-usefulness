@@ -986,27 +986,25 @@ fi
 COMMAND="\"$BUILDPATH/scripts-of-usefulness/script-components/download-drupal7-core.sh\" --multisitename=\"$MULTISITENAME\" --corepath=\"$BUILDPATH/core\" --drupalversion=7"
 eval ${COMMAND}
 
-cd "$BUILDPATH"
-
-if [ "$FEATURESCHECKOUT" = "fourcommunications" ] || [ "$FEATURESCHECKOUT" = "alexharries" ] || [ "$FEATURESCHECKOUT" = "custom" ]; then
-  cd "$BUILDPATH"
-  ${GITCLONECOMMAND} --branch "$FEATURESCHECKOUTBRANCH" --recursive "$FEATURESCLONEURL" features
-  cd features
-
-  if [ ! "x$CREATETAG" = "x" ]; then
-    createtag "$MULTISITENAME" "$CREATETAG"
-  fi
-
-  if [ "$REMOVEGIT" = "yes" ]; then
-    removegit "$BUILDPATH/features"
-  else
-    # Ignore file permission changes.
-    git config core.fileMode false
-  fi
-
-  # Link core/www/sites/all/modules/features to $BUILDPATH/features
-  ln -s "$BUILDPATH/features" "$BUILDPATH/core/www/sites/all/modules/features"
-fi
+#if [ "$FEATURESCHECKOUT" = "fourcommunications" ] || [ "$FEATURESCHECKOUT" = "alexharries" ] || [ "$FEATURESCHECKOUT" = "custom" ]; then
+#  cd "$BUILDPATH"
+#  ${GITCLONECOMMAND} --branch "$FEATURESCHECKOUTBRANCH" --recursive "$FEATURESCLONEURL" features
+#  cd features
+#
+#  if [ ! "x$CREATETAG" = "x" ]; then
+#    createtag "$MULTISITENAME" "$CREATETAG"
+#  fi
+#
+#  if [ "$REMOVEGIT" = "yes" ]; then
+#    removegit "$BUILDPATH/features"
+#  else
+#    # Ignore file permission changes.
+#    git config core.fileMode false
+#  fi
+#
+#  # Link core/www/sites/all/modules/features to $BUILDPATH/features
+#  ln -s "$BUILDPATH/features" "$BUILDPATH/core/www/sites/all/modules/features"
+#fi
 
 # sites-projects
 
@@ -1312,6 +1310,10 @@ if [[ -d "$BUILDPATH/core/www" && -d "$BUILDPATH/sites-common" ]]; then
 
   echo "Linking $DRUSHALIASESSYMLINKPATH to $DRUSHALIASESPHYSICALPATH:"
   ln -s "$DRUSHALIASESPHYSICALPATH" "$DRUSHALIASESSYMLINKPATH"
+
+  # Link $BUILDPATH/features to core/www/sites/all/modules/features for ease of
+  # editing; features is a submodule of the sites-common repo.
+  ln -s "$COMMONSITESSYMLINKPATH/all/modules/features" "$BUILDPATH/features"
 fi
 
 # Symlink the multisite itself.
